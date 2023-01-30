@@ -1,0 +1,46 @@
+# Project Climate Models
+
+Benutzerdefinierte Parameter:
+
+# CO2 Concentration [ppm]
+self.data['CO2']['value'] = 360.0 # default value
+# in the other simulations i'm using the ssp projected co2 concentrations
+# for the year 2100:
+# SSP5 "fossil-fueles development / taking the highway" = 1090ppm
+# SSP3 "middle of the road" = 790ppm
+# SSP1 "sustainability / taking the green road" = 610ppm
+
+# year before present (1950 AD)
+self.data['IYRBP']['value'] = 50 # default value
+# Simulation starts in 2000 -> just important for the orbital parameters
+# I use the default value for every simulation, hence, neglecting orbital
+# parameter changes from 2000 to 2100
+
+###########################################################################
+
+Simulation ausführen:
+
+1. python environment aktivieren (mithilfe des alias)
+python-vast
+
+2. OPTIONAL: runscript ausführen (zunächst mit i-flag)
+/daten/vast/arch/vast-git/models/plasim17/scripts/runscript.py -i
+
+3. runscript-user.rc erstellen
+siehe Parameter oben
+
+4. runscript als batch-job ausführen (mit bs-flags)
+
+5. Enjoy!
+
+###########################################################################
+
+# Questions:
+- Compute climatology?
+- How long to reach equilibrium? Does it really reach equilibrium?
+- Why using PLASIM?
+- Why run sensitivity experiments?
+
+# ToDo
+- check with IPCC report
+- remove results folder to save space

@@ -1,0 +1,11 @@
+# individual files
+Belegarbeit_Rahmen.pdf
+
+# simulation folder
+exps
+
+# editor folder/files
+code/.ipynb_checkpoints/
+code/.Rproj.user/
+.Rhistory
+*.Rproj
