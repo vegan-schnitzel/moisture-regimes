@@ -14,6 +14,13 @@ Investigating precipitation changes under different global warming scenarios (i.
 
 ```{r libraries, include=FALSE}
 library("tidyverse")
+library("ncdf4")
+library("sf")
+library("raster")
+library("rasterVis")
+library("RColorBrewer")
+
+# DO NOT FORGET TO ACTIVATE CONDA ENV
 
 knitr::opts_chunk$set(
   fig.width = 6, fig.asp = 0.618, out.width = "70%", fig.align = "center",
@@ -30,14 +37,14 @@ sessionInfo()
 
 1. **Climate simulations**: I'm using three PLASIM runs with CO2 concentrations of 610ppm, 790ppm & 1090ppm (the numbers come from SSPs, see section below). The default ("reference") value is 360ppm. The simulations start in 2000 and last for 30 years.
 2. **Preprocessing** (using `cdo`-commands):
-    - Compute climatology from *global* mean temperature for all simulations. Remove 29 Feb. Use final 10 years of simulation and compute 5-day arithmetic mean. Get climatology (values and standard deviation) by averaging years.
-    - Similarly for precipitation, but keeping spatial dimensions. (Ist das richtig so? Also äquivalent zur Temperatur?) Save data.
-    - Then, compute (time) average and anomaly. **Note**: Since $\overline{x_i} - \overline{y_i} = \overline{x_i - y_i}$, it doesn't matter in which order anomaly and average are computed.
+    - Compute climatology from *global* mean temperature for all simulations. Remove 29 Feb. Use final 10 years of simulation and compute 5-day arithmetic mean. Get climatology (and saving standard deviation of this averaging).
+    - Similarly for precipitation, but keeping spatial dimensions (Ist das richtig so? Also äquivalent zur Temperatur? Oder lieber Summe?). Then, compute (time) average of precipitation values and use *maximum* standard deviation to get single mean "equilibrium" state. Subtract reference to get anomaly (Wie bestimmt man Signifikanz? Fehlerfortpflanzung?)
+    - (Note: Since $\overline{x_i} - \overline{y_i} = \overline{x_i - y_i}$, it doesn't matter in which order anomaly and average are computed.)
     
 3. **Analysis** in this notebook:
-    - Visualize temperature climatology. Compute anomalies (subtract reference climatology, Fehlerfortpflanzung!). Get global surface temperature warming $\Delta T_{s}$ for each simulation by (time-)averaging climatology (std's mitteln?).
+    - Visualize temperature climatology. Compute anomalies (subtract reference climatology, Fehlerfortpflanzung!). Get global surface temperature warming $\Delta T_{s}$ for each simulation by (time-)averaging climatology (std's auch mitteln?).
     - Plot map of mean precipitation anomaly.
-    - Investigate region in particular? Something else?
+    - Investigate region in particular? Or just one season? Something else?
 
 # Shared Socioeconomic Pathways
 
@@ -47,12 +54,12 @@ The atmospheric CO2 concentration can be derived from these projected socioecono
 ssps <- read_csv(
   "../data/ipcc-scenarios.csv",
   col_select = c("Scenario", "Year", "CO2 concentration")
-  ) %>% 
+  ) |> 
   rename(CO2_concentration=`CO2 concentration`) # remove whitespace in column label
 ```
 ```{r ssps plots}
-ssps %>% 
-  filter(grepl("Baseline", Scenario)) %>%  # keep "baseline" scenarios
+ssps |> 
+  filter(grepl("Baseline", Scenario)) |>   # keep "baseline" scenarios
   ggplot(aes(Year, CO2_concentration, color = Scenario)) +
     geom_line() +
     geom_point() +
@@ -62,4 +69,41 @@ ssps %>%
   #ggsave("../figs/ssps.png")
 ```
 
-# 
+# Temperature
+
+Plotting climatology.
+
+```{r}
+ssp1 <- nc_open("../data/SSP1-tmp-clim.nc")
+tmp1 <- ncvar_get(ssp1, "t2m")
+t1 <- ncvar_get(ssp1, "time")
+
+ggplot() +
+  geom_line(aes(x = t1, y = tmp1))
+```
+
+# Precipitation
+
+Plotting (mean of) climatology.
+
+```{r}
+# read netcdf file
+pre <- raster("../data/SSP1-pre-clim.nc")
+prenc <- nc_open("../data/SSP1-pre-clim.nc")
+lon <- ncvar_get(prenc, "lon")
+lon
+# read country borders
+shp <- shapefile("../data/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp")
+
+
+# color map
+mapTheme <- rasterTheme(region = brewer.pal(8, "Blues"))
+
+plot(pre) +
+  plot(shp)
+
+#levelplot(pre, margin = F, par.settings = mapTheme, main = "SSP1: Precipitation")
+  #latticeExtra::layer(sp.lines(shp, col = "black", lwd = 0.5))
+  
+```
+
