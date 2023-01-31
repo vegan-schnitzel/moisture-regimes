@@ -1,20 +1,16 @@
 ---
-title: 'Climate Models: Final Project'
+title: "Impact of atmospheric CO2 concentration on precipitation"
 author: "Robert Wright"
 date: "2023-01-11"
 output:
+  html_notebook: default
+  github_document: default
   html_document:
     df_print: paged
-  github_document: default
-  html_notebook: default
   pdf_document: default
 ---
 
-Investigating precipitation under global warming scenarios.
-
-# Shared Socioeconomic Pathways
-
-The atmospheric co2 concentration can be derived from these projected socioeconomic pathways, I use the preprocessed data from [ourworldindata](https://ourworldindata.org/explorers/ipcc-scenarios?facet=none&Metric=Greenhouse+gas+concentrations&Sub-metric=Carbon+dioxide+%28CO%E2%82%82%29&Rate=Per+capita&Region=Global&country=SSP1+-+Baseline~SSP2+-+Baseline~SSP3+-+Baseline~SSP4+-+Baseline~SSP5+-+Baseline).
+Investigating precipitation changes under different global warming scenarios (i.e., different CO2 concentrations).
 
 ```{r libraries, include=FALSE}
 library("tidyverse")
@@ -26,21 +22,44 @@ knitr::opts_chunk$set(
 ```
 
 
+```{r}
+sessionInfo()
+```
+
+# Outline
+
+1. **Climate simulations**: I'm using three PLASIM runs with CO2 concentrations of 610ppm, 790ppm & 1090ppm (the numbers come from SSPs, see section below). The default ("reference") value is 360ppm. The simulations start in 2000 and last for 30 years.
+2. **Preprocessing** (using `cdo`-commands):
+    - Compute climatology from *global* mean temperature for all simulations. Remove 29 Feb. Use final 10 years of simulation and compute 5-day arithmetic mean. Get climatology (values and standard deviation) by averaging years.
+    - Similarly for precipitation, but keeping spatial dimensions. (Ist das richtig so? Also äquivalent zur Temperatur?) Save data.
+    - Then, compute (time) average and anomaly. **Note**: Since $\overline{x_i} - \overline{y_i} = \overline{x_i - y_i}$, it doesn't matter in which order anomaly and average are computed.
+    
+3. **Analysis** in this notebook:
+    - Visualize temperature climatology. Compute anomalies (subtract reference climatology, Fehlerfortpflanzung!). Get global surface temperature warming $\Delta T_{s}$ for each simulation by (time-)averaging climatology (std's mitteln?).
+    - Plot map of mean precipitation anomaly.
+    - Investigate region in particular? Something else?
+
+# Shared Socioeconomic Pathways
+
+The atmospheric CO2 concentration can be derived from these projected socioeconomic pathways, I use the preprocessed data from [ourworldindata](https://ourworldindata.org/explorers/ipcc-scenarios?facet=none&Metric=Greenhouse+gas+concentrations&Sub-metric=Carbon+dioxide+%28CO%E2%82%82%29&Rate=Per+capita&Region=Global&country=SSP1+-+Baseline~SSP2+-+Baseline~SSP3+-+Baseline~SSP4+-+Baseline~SSP5+-+Baseline).
+
 ```{r ssps import}
 ssps <- read_csv(
   "../data/ipcc-scenarios.csv",
   col_select = c("Scenario", "Year", "CO2 concentration")
-  ) |> 
+  ) %>% 
   rename(CO2_concentration=`CO2 concentration`) # remove whitespace in column label
 ```
-```{r ssps-plots}
-ssps |> 
-  filter(grepl("Baseline", Scenario)) |> # keep "baseline" scenarios
+```{r ssps plots}
+ssps %>% 
+  filter(grepl("Baseline", Scenario)) %>%  # keep "baseline" scenarios
   ggplot(aes(Year, CO2_concentration, color = Scenario)) +
     geom_line() +
     geom_point() +
     labs(title = "Shared Socioeconomic Pathways",
          x = "year",
          y = "CO2 concentration")
-  ggsave("../figs/ssps.png")
+  #ggsave("../figs/ssps.png")
 ```
+
+# 

@@ -39,6 +39,8 @@ siehe Parameter oben
 - Compute climatology?
 - How long to reach equilibrium? Does it really reach equilibrium?
 - Why using PLASIM?
+- Which convection parametrization uses PLASIM?
+- Also analyse clouds, sea ice, etc?
 - Why run sensitivity experiments?
 
 # ToDo
