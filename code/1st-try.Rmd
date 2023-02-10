@@ -93,17 +93,18 @@ prenc <- nc_open("../data/SSP1-pre-clim.nc")
 lon <- ncvar_get(prenc, "lon")
 lon
 # read country borders
-shp <- shapefile("../data/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp")
-
+sshp <- shapefile("../data/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp")
+shp <- read_sf("../data/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp")
+pshp <- as(st_geometry(shp), Class = "Spatial")
 
 # color map
 mapTheme <- rasterTheme(region = brewer.pal(8, "Blues"))
 
-plot(pre) +
-  plot(shp)
+#plot(pre) +
+#  plot(shp)
 
-#levelplot(pre, margin = F, par.settings = mapTheme, main = "SSP1: Precipitation")
-  #latticeExtra::layer(sp.lines(shp, col = "black", lwd = 0.5))
+levelplot(pre, margin = F, par.settings = mapTheme, main = "SSP1: Precipitation") +
+  latticeExtra::layer(sp.lines(pshp, col = "black", lwd = 0.5))
   
 ```
 
