@@ -4,9 +4,13 @@ Belegarbeit_Rahmen.pdf
 # simulation folder
 exps
 
-# editor folder/files
+# code editor stuff
 code/.ipynb_checkpoints/
 code/.Rproj.user/
 .Rhistory
 *.Rproj
 .Rproj.user
+
+# other file types
+*.odp
+*.xcf
