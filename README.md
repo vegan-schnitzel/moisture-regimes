@@ -6,7 +6,7 @@ sum is going to increase in high CO2 concentration scenarios. This change is not
 but closely follows the global atmospheric circulation pattern.
 By implementing a moisture regime classification (see figure below),
 we identify regions experiencing severe alternations in water availability,
-which is probably most challenging for future generations.
+which is probably most challenging for future generations. Further information is available in the written [report](report/report.pdf).
 
 ![moisture regimes](figs/regimes.png)
 
